@@ -1,0 +1,859 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>心透視AI — PSYCHIC · HEART · AI · TRUTH</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@400;600;700&family=Cinzel:wght@400;600;700&family=Noto+Sans+JP:wght@300;400;500&display=swap');
+
+  :root {
+    --gold: #d4a843;
+    --gold-light: #f0c96a;
+    --purple-deep: #1a0a3d;
+    --purple-mid: #2d1060;
+    --purple-bright: #7b35d4;
+    --red: #c0392b;
+    --red-bright: #e74c3c;
+    --bg: #08010f;
+    --text: #f0e8ff;
+    --text-dim: #9b8ec4;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Noto Sans JP', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* Starfield background */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background:
+      radial-gradient(ellipse at 20% 20%, rgba(123,53,212,0.15) 0%, transparent 50%),
+      radial-gradient(ellipse at 80% 80%, rgba(192,57,43,0.1) 0%, transparent 50%),
+      radial-gradient(ellipse at 50% 50%, rgba(26,10,61,0.8) 0%, transparent 100%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .stars {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .star {
+    position: absolute;
+    width: 2px;
+    height: 2px;
+    background: white;
+    border-radius: 50%;
+    animation: twinkle var(--dur, 3s) ease-in-out infinite var(--delay, 0s);
+    opacity: 0;
+  }
+
+  @keyframes twinkle {
+    0%, 100% { opacity: 0; }
+    50% { opacity: var(--max-op, 0.8); }
+  }
+
+  /* HEADER */
+  header {
+    position: relative;
+    z-index: 10;
+    text-align: center;
+    padding: 48px 20px 32px;
+    border-bottom: 1px solid rgba(212,168,67,0.2);
+  }
+
+  .badge {
+    display: inline-block;
+    background: linear-gradient(135deg, #7b0000, #c0392b);
+    color: white;
+    font-family: 'Cinzel', serif;
+    font-size: 11px;
+    letter-spacing: 3px;
+    padding: 6px 20px;
+    border-radius: 20px;
+    margin-bottom: 24px;
+    border: 1px solid rgba(231,76,60,0.5);
+  }
+
+  .orb {
+    width: 80px;
+    height: 80px;
+    margin: 0 auto 20px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 35% 35%, #f0c96a, #9b35d4 40%, #1a0a3d 80%);
+    box-shadow: 0 0 40px rgba(123,53,212,0.6), 0 0 80px rgba(123,53,212,0.3), inset 0 0 20px rgba(255,255,255,0.1);
+    animation: orbPulse 4s ease-in-out infinite;
+  }
+
+  @keyframes orbPulse {
+    0%, 100% { box-shadow: 0 0 40px rgba(123,53,212,0.6), 0 0 80px rgba(123,53,212,0.3); }
+    50% { box-shadow: 0 0 60px rgba(212,168,67,0.6), 0 0 120px rgba(123,53,212,0.4); }
+  }
+
+  h1 {
+    font-family: 'Noto Serif JP', serif;
+    font-size: clamp(32px, 8vw, 52px);
+    font-weight: 700;
+    color: var(--gold);
+    letter-spacing: 6px;
+    text-shadow: 0 0 30px rgba(212,168,67,0.5);
+    margin-bottom: 8px;
+  }
+
+  .subtitle {
+    font-family: 'Cinzel', serif;
+    font-size: 11px;
+    letter-spacing: 4px;
+    color: var(--text-dim);
+  }
+
+  .tagline {
+    margin-top: 16px;
+    font-size: 15px;
+    color: var(--text);
+    line-height: 1.8;
+  }
+
+  .tagline span { color: var(--gold); font-weight: 700; }
+
+  /* NAV TABS */
+  .nav {
+    position: relative;
+    z-index: 10;
+    display: flex;
+    gap: 4px;
+    padding: 20px 16px;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  .nav::-webkit-scrollbar { display: none; }
+
+  .nav-btn {
+    flex-shrink: 0;
+    padding: 10px 16px;
+    border-radius: 12px;
+    border: 1px solid rgba(212,168,67,0.3);
+    background: rgba(26,10,61,0.6);
+    color: var(--text-dim);
+    font-family: 'Noto Sans JP', sans-serif;
+    font-size: 12px;
+    cursor: pointer;
+    transition: all 0.3s;
+    white-space: nowrap;
+    backdrop-filter: blur(10px);
+  }
+
+  .nav-btn.active {
+    background: linear-gradient(135deg, var(--purple-mid), var(--purple-bright));
+    border-color: var(--gold);
+    color: white;
+    box-shadow: 0 4px 20px rgba(123,53,212,0.4);
+  }
+
+  .nav-btn:hover:not(.active) {
+    border-color: var(--gold);
+    color: var(--gold);
+  }
+
+  /* PANELS */
+  .panels {
+    position: relative;
+    z-index: 10;
+    max-width: 680px;
+    margin: 0 auto;
+    padding: 0 16px 40px;
+  }
+
+  .panel {
+    display: none;
+    animation: fadeIn 0.4s ease;
+  }
+
+  .panel.active { display: block; }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(12px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .panel-header {
+    text-align: center;
+    margin-bottom: 24px;
+    padding: 24px;
+    border-radius: 16px;
+    background: linear-gradient(135deg, rgba(26,10,61,0.8), rgba(45,16,96,0.6));
+    border: 1px solid rgba(212,168,67,0.2);
+  }
+
+  .panel-icon { font-size: 32px; margin-bottom: 8px; }
+
+  .panel-label {
+    font-family: 'Cinzel', serif;
+    font-size: 9px;
+    letter-spacing: 3px;
+    color: var(--text-dim);
+    margin-bottom: 4px;
+  }
+
+  .panel-title {
+    font-family: 'Noto Serif JP', serif;
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--gold);
+    margin-bottom: 8px;
+  }
+
+  .panel-desc {
+    font-size: 13px;
+    color: var(--text-dim);
+    line-height: 1.7;
+  }
+
+  /* INPUT AREA */
+  .input-section {
+    margin-bottom: 20px;
+  }
+
+  label {
+    display: block;
+    font-size: 13px;
+    color: var(--gold-light);
+    margin-bottom: 8px;
+    font-weight: 500;
+  }
+
+  textarea, input[type="text"] {
+    width: 100%;
+    background: rgba(26,10,61,0.7);
+    border: 1px solid rgba(212,168,67,0.3);
+    border-radius: 12px;
+    padding: 14px 16px;
+    color: var(--text);
+    font-family: 'Noto Sans JP', sans-serif;
+    font-size: 14px;
+    resize: vertical;
+    transition: border-color 0.3s, box-shadow 0.3s;
+    backdrop-filter: blur(10px);
+  }
+
+  textarea { min-height: 120px; }
+
+  textarea:focus, input[type="text"]:focus {
+    outline: none;
+    border-color: var(--gold);
+    box-shadow: 0 0 20px rgba(212,168,67,0.2);
+  }
+
+  textarea::placeholder, input::placeholder {
+    color: rgba(155,142,196,0.5);
+  }
+
+  /* BUTTONS */
+  .btn-primary {
+    width: 100%;
+    padding: 16px;
+    border-radius: 14px;
+    border: none;
+    background: linear-gradient(135deg, #7b35d4, #d4a843);
+    color: white;
+    font-family: 'Noto Serif JP', serif;
+    font-size: 16px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.3s;
+    letter-spacing: 2px;
+    margin-top: 8px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .btn-primary::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(255,255,255,0.1), transparent);
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+
+  .btn-primary:hover::before { opacity: 1; }
+  .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 8px 30px rgba(123,53,212,0.5); }
+  .btn-primary:active { transform: translateY(0); }
+  .btn-primary:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+
+  .btn-red {
+    background: linear-gradient(135deg, #7b0000, #c0392b);
+    box-shadow: 0 4px 20px rgba(192,57,43,0.3);
+  }
+  .btn-red:hover { box-shadow: 0 8px 30px rgba(192,57,43,0.5); }
+
+  /* RESULT CARD */
+  .result-card {
+    display: none;
+    margin-top: 20px;
+    padding: 24px;
+    border-radius: 16px;
+    background: linear-gradient(135deg, rgba(26,10,61,0.9), rgba(45,16,96,0.7));
+    border: 1px solid rgba(212,168,67,0.4);
+    animation: fadeIn 0.5s ease;
+  }
+
+  .result-card.show { display: block; }
+
+  .result-card h3 {
+    font-family: 'Noto Serif JP', serif;
+    font-size: 16px;
+    color: var(--gold);
+    margin-bottom: 16px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid rgba(212,168,67,0.2);
+  }
+
+  .result-text {
+    font-size: 14px;
+    line-height: 1.9;
+    color: var(--text);
+    white-space: pre-wrap;
+  }
+
+  /* METER */
+  .meter-section {
+    margin-bottom: 16px;
+  }
+
+  .meter-label {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+    font-size: 13px;
+    color: var(--text-dim);
+  }
+
+  .meter-value {
+    font-family: 'Cinzel', serif;
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--gold);
+  }
+
+  .meter-bar-bg {
+    height: 10px;
+    background: rgba(26,10,61,0.8);
+    border-radius: 5px;
+    overflow: hidden;
+    border: 1px solid rgba(212,168,67,0.2);
+  }
+
+  .meter-bar {
+    height: 100%;
+    border-radius: 5px;
+    background: linear-gradient(90deg, #7b35d4, #d4a843);
+    width: 0%;
+    transition: width 1.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+
+  .meter-bar.danger { background: linear-gradient(90deg, #7b0000, #e74c3c); }
+
+  /* LOADING */
+  .loading {
+    display: none;
+    text-align: center;
+    padding: 32px;
+    color: var(--text-dim);
+    font-size: 14px;
+  }
+
+  .loading.show { display: block; }
+
+  .loading-orb {
+    width: 50px;
+    height: 50px;
+    margin: 0 auto 16px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 35% 35%, #f0c96a, #9b35d4);
+    animation: orbSpin 1.5s ease-in-out infinite;
+    box-shadow: 0 0 30px rgba(123,53,212,0.6);
+  }
+
+  @keyframes orbSpin {
+    0% { transform: scale(0.9); box-shadow: 0 0 20px rgba(212,168,67,0.4); }
+    50% { transform: scale(1.1); box-shadow: 0 0 40px rgba(123,53,212,0.8); }
+    100% { transform: scale(0.9); box-shadow: 0 0 20px rgba(212,168,67,0.4); }
+  }
+
+  /* EXTRA FIELDS */
+  .field-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 16px;
+  }
+
+  @media (max-width: 400px) {
+    .field-row { grid-template-columns: 1fr; }
+  }
+
+  /* FOOTER */
+  footer {
+    position: relative;
+    z-index: 10;
+    text-align: center;
+    padding: 24px;
+    border-top: 1px solid rgba(212,168,67,0.1);
+    color: var(--text-dim);
+    font-size: 11px;
+    line-height: 1.8;
+  }
+
+  /* Alert banner */
+  .alert-banner {
+    background: rgba(192,57,43,0.15);
+    border: 1px solid rgba(192,57,43,0.4);
+    border-radius: 12px;
+    padding: 14px 16px;
+    margin-bottom: 16px;
+    font-size: 13px;
+    color: #f5a895;
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+  }
+</style>
+</head>
+<body>
+
+<!-- Stars -->
+<div class="stars" id="stars"></div>
+
+<!-- Header -->
+<header>
+  <div class="badge">✦ NEW · AI PSYCHIC ANALYSIS ✦</div>
+  <div class="orb"></div>
+  <h1>心透視AI</h1>
+  <div class="subtitle">PSYCHIC · HEART · AI · TRUTH</div>
+  <div class="tagline">
+    あなたの恋愛、本当に大丈夫ですか？<br>
+    彼の嘘、<span>バレます。</span>言葉の裏側に、<span>本当の愛がある。</span>
+  </div>
+</header>
+
+<!-- Navigation -->
+<nav class="nav">
+  <button class="nav-btn active" onclick="switchPanel('lie')">🚨 嘘発見AI</button>
+  <button class="nav-btn" onclick="switchPanel('feeling')">💜 本音解析AI</button>
+  <button class="nav-btn" onclick="switchPanel('future')">🔮 未来透視AI</button>
+  <button class="nav-btn" onclick="switchPanel('talent')">✨ 才能発見AI</button>
+</nav>
+
+<!-- Panels -->
+<div class="panels">
+
+  <!-- LIE DETECTION -->
+  <div class="panel active" id="panel-lie">
+    <div class="panel-header">
+      <div class="panel-icon">🚨</div>
+      <div class="panel-label">LIE DETECTION AI</div>
+      <div class="panel-title">嘘発見・深層心理AI</div>
+      <div class="panel-desc">彼が言った言葉をそのまま貼り付けるだけ。<br>嘘の可能性を%で表示。言葉の矛盾・防衛機制・ガスライティングの兆候まで、心理学に基づき深層を分析します。</div>
+    </div>
+
+    <div class="alert-banner">
+      🔍 AIは言葉のパターン・矛盾・心理的防衛機制を分析します。エンタメ・自己理解を目的としています。
+    </div>
+
+    <div class="input-section">
+      <label>▶ 彼の言葉・メッセージをここに貼り付けてください</label>
+      <textarea id="lie-input" placeholder="例：「仕事が忙しくて連絡できなかった。本当に好きなのに信じてもらえない」&#10;&#10;LINEの文章や会話をそのままコピペしてください"></textarea>
+    </div>
+
+    <div class="input-section">
+      <label>▶ 気になる状況を教えてください（任意）</label>
+      <input type="text" id="lie-context" placeholder="例：最近返信が遅い、スマホを隠すようになった">
+    </div>
+
+    <button class="btn-primary btn-red" onclick="analyze('lie')" id="btn-lie">
+      🚨 今すぐ嘘を暴く
+    </button>
+
+    <div class="loading" id="loading-lie">
+      <div class="loading-orb"></div>
+      AIが深層心理を読み解いています…
+    </div>
+
+    <div class="result-card" id="result-lie">
+      <div class="meter-section" id="lie-meter-section">
+        <div class="meter-label">
+          <span>嘘の可能性</span>
+          <span class="meter-value" id="lie-percent">--%</span>
+        </div>
+        <div class="meter-bar-bg">
+          <div class="meter-bar danger" id="lie-bar"></div>
+        </div>
+      </div>
+      <h3>✦ 深層分析結果</h3>
+      <div class="result-text" id="lie-result"></div>
+    </div>
+  </div>
+
+  <!-- TRUE FEELING -->
+  <div class="panel" id="panel-feeling">
+    <div class="panel-header">
+      <div class="panel-icon">💜</div>
+      <div class="panel-label">TRUE FEELING AI</div>
+      <div class="panel-title">本音解析AI</div>
+      <div class="panel-desc">相手の言葉の裏に隠された本当の感情を読み解きます。<br>脈あり度もバーで表示。今すべき行動まで明確にお伝えします。</div>
+    </div>
+
+    <div class="input-section">
+      <label>▶ 相手からのメッセージ・言葉</label>
+      <textarea id="feeling-input" placeholder="例：「また連絡するね」「今日楽しかった」「友達として大切にしたい」&#10;&#10;気になる言葉をそのまま入力してください"></textarea>
+    </div>
+
+    <div class="field-row">
+      <div>
+        <label>あなたの関係</label>
+        <input type="text" id="feeling-relation" placeholder="例：片思い・元彼・職場">
+      </div>
+      <div>
+        <label>交際期間・知り合ってから</label>
+        <input type="text" id="feeling-period" placeholder="例：3ヶ月・2年">
+      </div>
+    </div>
+
+    <button class="btn-primary" onclick="analyze('feeling')" id="btn-feeling">
+      💜 本音を読み解く
+    </button>
+
+    <div class="loading" id="loading-feeling">
+      <div class="loading-orb"></div>
+      AIが相手の本音を透視しています…
+    </div>
+
+    <div class="result-card" id="result-feeling">
+      <div class="meter-section">
+        <div class="meter-label">
+          <span>脈あり度</span>
+          <span class="meter-value" id="feeling-percent">--%</span>
+        </div>
+        <div class="meter-bar-bg">
+          <div class="meter-bar" id="feeling-bar"></div>
+        </div>
+      </div>
+      <h3>✦ 本音解析結果</h3>
+      <div class="result-text" id="feeling-result"></div>
+    </div>
+  </div>
+
+  <!-- FUTURE VISION -->
+  <div class="panel" id="panel-future">
+    <div class="panel-header">
+      <div class="panel-icon">🔮</div>
+      <div class="panel-label">FUTURE VISION AI</div>
+      <div class="panel-title">未来透視AI</div>
+      <div class="panel-desc">今の悩みから近未来の流れ・チャンス・開運行動まで透視。<br>あなただけの未来への道筋をAIが示します。</div>
+    </div>
+
+    <div class="input-section">
+      <label>▶ 今のお悩みや状況を教えてください</label>
+      <textarea id="future-input" placeholder="例：「彼との関係が停滞している。このまま進展するのか、別れるべきか分からない。最近彼が冷たい気がする」&#10;&#10;できるだけ詳しく書くほど精度が上がります"></textarea>
+    </div>
+
+    <div class="field-row">
+      <div>
+        <label>あなたの生年月日</label>
+        <input type="text" id="future-birth" placeholder="例：1995年3月15日">
+      </div>
+      <div>
+        <label>相手の生年月日（分かれば）</label>
+        <input type="text" id="future-birth2" placeholder="例：1990年7月22日">
+      </div>
+    </div>
+
+    <button class="btn-primary" onclick="analyze('future')" id="btn-future">
+      🔮 未来を透視する
+    </button>
+
+    <div class="loading" id="loading-future">
+      <div class="loading-orb"></div>
+      AIがあなたの未来の流れを読んでいます…
+    </div>
+
+    <div class="result-card" id="result-future">
+      <h3>✦ 近未来透視結果</h3>
+      <div class="result-text" id="future-result"></div>
+    </div>
+  </div>
+
+  <!-- TALENT DISCOVERY -->
+  <div class="panel" id="panel-talent">
+    <div class="panel-header">
+      <div class="panel-icon">✨</div>
+      <div class="panel-label">SELF DISCOVERY AI</div>
+      <div class="panel-title">気づき・才能発見AI</div>
+      <div class="panel-desc">あなたの隠れた才能・本当の強みをAIが発見。<br>悩みの奥に眠る気づきと、前向きな一歩をお届けします。</div>
+    </div>
+
+    <div class="input-section">
+      <label>▶ 今感じている悩みや、自分について気になること</label>
+      <textarea id="talent-input" placeholder="例：「自分に自信が持てない。恋愛でいつも同じ失敗をする。本当にやりたいことが分からない」&#10;&#10;正直に何でも書いてください"></textarea>
+    </div>
+
+    <div class="input-section">
+      <label>▶ あなたの名前（ひらがな・カタカナ可）</label>
+      <input type="text" id="talent-name" placeholder="例：さくら、ユイ">
+    </div>
+
+    <button class="btn-primary" onclick="analyze('talent')" id="btn-talent">
+      ✨ 隠れた才能を発見する
+    </button>
+
+    <div class="loading" id="loading-talent">
+      <div class="loading-orb"></div>
+      AIがあなたの内なる才能を読み解いています…
+    </div>
+
+    <div class="result-card" id="result-talent">
+      <h3>✦ 才能・気づき発見結果</h3>
+      <div class="result-text" id="talent-result"></div>
+    </div>
+  </div>
+
+</div>
+
+<!-- Footer -->
+<footer>
+  ✦ 完全プライベート・安全 ✦ 登録不要 ✦ 今すぐ開始 ✦<br>
+  ※ このアプリはエンタメ・自己理解を目的としたものです。
+</footer>
+
+<script>
+// Generate stars
+const starsEl = document.getElementById('stars');
+for (let i = 0; i < 80; i++) {
+  const star = document.createElement('div');
+  star.className = 'star';
+  star.style.left = Math.random() * 100 + '%';
+  star.style.top = Math.random() * 100 + '%';
+  star.style.setProperty('--dur', (2 + Math.random() * 4) + 's');
+  star.style.setProperty('--delay', (Math.random() * 4) + 's');
+  star.style.setProperty('--max-op', (0.3 + Math.random() * 0.7).toString());
+  starsEl.appendChild(star);
+}
+
+// Switch panels
+function switchPanel(id) {
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('panel-' + id).classList.add('active');
+  event.target.classList.add('active');
+}
+
+// Animate meter bar
+function animateMeter(barId, pctId, value) {
+  const bar = document.getElementById(barId);
+  const pct = document.getElementById(pctId);
+  if (!bar || !pct) return;
+  setTimeout(() => {
+    bar.style.width = value + '%';
+    let current = 0;
+    const interval = setInterval(() => {
+      current += 2;
+      if (current >= value) { current = value; clearInterval(interval); }
+      pct.textContent = current + '%';
+    }, 20);
+  }, 300);
+}
+
+// Parse percent from AI response text
+function extractPercent(text) {
+  const m = text.match(/(\d{1,3})\s*%/);
+  return m ? Math.min(parseInt(m[1]), 99) : Math.floor(30 + Math.random() * 50);
+}
+
+// Main analyze function
+async function analyze(type) {
+  const prompts = {
+    lie: () => {
+      const msg = document.getElementById('lie-input').value.trim();
+      const ctx = document.getElementById('lie-context').value.trim();
+      if (!msg) { alert('メッセージを入力してください'); return null; }
+      return `あなたは心理学の専門家です。以下の言葉・メッセージを心理学の観点から深く分析してください。
+
+【分析対象のメッセージ】
+${msg}
+
+${ctx ? '【状況・背景】\n' + ctx : ''}
+
+以下の形式で日本語で回答してください：
+
+嘘の可能性：XX%
+
+【言葉の矛盾・不自然な点】
+（具体的に指摘）
+
+【防衛機制・心理パターン】
+（心理学的分析）
+
+【ガスライティングの兆候】
+（あれば指摘、なければ「見られません」）
+
+【総合分析】
+（200字程度で総括）
+
+【アドバイス】
+（あなたへの具体的な行動アドバイス）`;
+    },
+    feeling: () => {
+      const msg = document.getElementById('feeling-input').value.trim();
+      const rel = document.getElementById('feeling-relation').value.trim();
+      const period = document.getElementById('feeling-period').value.trim();
+      if (!msg) { alert('メッセージを入力してください'); return null; }
+      return `あなたは恋愛心理学の専門家です。以下の状況から相手の本音を分析してください。
+
+【相手の言葉・メッセージ】
+${msg}
+
+【関係性】${rel || '不明'}
+【期間】${period || '不明'}
+
+以下の形式で日本語で回答してください：
+
+脈あり度：XX%
+
+【言葉の裏に隠された本音】
+（心理学的に詳しく分析）
+
+【相手の感情状態】
+（今どんな気持ちか）
+
+【アタッチメントスタイル分析】
+（回避型・不安型・安定型などの分析）
+
+【今すぐすべき行動】
+（具体的な3ステップ）
+
+【注意点】
+（気をつけること）`;
+    },
+    future: () => {
+      const worry = document.getElementById('future-input').value.trim();
+      const birth1 = document.getElementById('future-birth').value.trim();
+      const birth2 = document.getElementById('future-birth2').value.trim();
+      if (!worry) { alert('悩みや状況を入力してください'); return null; }
+      return `あなたは心理学と直感的洞察を組み合わせた恋愛カウンセラーです。以下の状況から近未来の流れを分析してください。
+
+【現在の状況・悩み】
+${worry}
+
+${birth1 ? '【あなたの生年月日】' + birth1 : ''}
+${birth2 ? '【相手の生年月日】' + birth2 : ''}
+
+以下の形式で日本語で回答してください（エンタメ・自己理解目的として）：
+
+【現在の状況分析】
+（今のエネルギーと流れ）
+
+【1〜2週間以内の流れ】
+（近い未来の展開）
+
+【1ヶ月後の可能性】
+（チャンスと注意点）
+
+【開運行動3つ】
+（今すぐできること）
+
+【チャンスの時期】
+（タイミングのヒント）
+
+【メッセージ】
+（あなたへの温かい言葉）`;
+    },
+    talent: () => {
+      const worry = document.getElementById('talent-input').value.trim();
+      const name = document.getElementById('talent-name').value.trim();
+      if (!worry) { alert('悩みや状況を入力してください'); return null; }
+      return `あなたは心理カウンセラー兼才能発見の専門家です。以下の悩みと状況から、その人の隠れた才能と気づきを引き出してください。
+
+【名前】${name || '匿名'}
+【悩み・状況】
+${worry}
+
+以下の形式で日本語で温かく回答してください：
+
+【あなたが気づいていない隠れた才能】
+（具体的に3つ）
+
+【悩みの裏に眠る強み】
+（ネガティブに見える特性の肯定的な側面）
+
+【本当の自分】
+（深層の自己像）
+
+【前向きな一歩】
+（今日からできる具体的な行動）
+
+【あなたへのメッセージ】
+（心に響く励ましの言葉）`;
+    }
+  };
+
+  const prompt = prompts[type]();
+  if (!prompt) return;
+
+  // Show loading
+  document.getElementById('loading-' + type).classList.add('show');
+  document.getElementById('result-' + type).classList.remove('show');
+  document.getElementById('btn-' + type).disabled = true;
+
+  try {
+    const response = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 1000,
+        messages: [{ role: 'user', content: prompt }]
+      })
+    });
+
+    const data = await response.json();
+    const text = data.content?.map(c => c.text || '').join('') || 'エラーが発生しました。';
+
+    document.getElementById('loading-' + type).classList.remove('show');
+    document.getElementById('result-' + type).classList.add('show');
+
+    if (type === 'lie') {
+      const pct = extractPercent(text);
+      animateMeter('lie-bar', 'lie-percent', pct);
+      document.getElementById('lie-result').textContent = text.replace(/嘘の可能性：\d+%\n?/, '').trim();
+    } else if (type === 'feeling') {
+      const pct = extractPercent(text);
+      animateMeter('feeling-bar', 'feeling-percent', pct);
+      document.getElementById('feeling-result').textContent = text.replace(/脈あり度：\d+%\n?/, '').trim();
+    } else {
+      document.getElementById(type + '-result').textContent = text;
+    }
+
+  } catch (err) {
+    document.getElementById('loading-' + type).classList.remove('show');
+    alert('通信エラーが発生しました。もう一度お試しください。');
+  }
+
+  document.getElementById('btn-' + type).disabled = false;
+}
+</script>
+</body>
+</html>
