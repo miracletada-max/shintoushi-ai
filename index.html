@@ -845,10 +845,6 @@ if (type === 'lie') {
       document.getElementById(type + '-result').textContent = text;
     }
 
-  } catch (err) {
-    document.getElementById('loading-' + type).classList.remove('show');
-    alert('通信エラーが発生しました。もう一度お試しください。');
-  }
 
   document.getElementById('btn-' + type).disabled = false;
 }
