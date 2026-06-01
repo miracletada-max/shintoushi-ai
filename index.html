@@ -831,9 +831,8 @@ ${worry}
 
 可能性としては、本音を全部は言えていない
 `;
-      
 
-    if (type === 'lie') {
+if (type === 'lie') {
       const pct = extractPercent(text);
       animateMeter('lie-bar', 'lie-percent', pct);
       document.getElementById('lie-result').textContent = text.replace(/嘘の可能性：\d+%\n?/, '').trim();
