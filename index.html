@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>心透視AI</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@300;400;600&family=Cinzel+Decorative:wght@400;700&family=Noto+Sans+JP:wght@300;400&display=swap" rel="stylesheet">
+<style>
+:root{--void:#050308;--deep:#0d0818;--pglow:#9333ea;--gold:#d4af37;--gold2:#f0d060;--silver:#c0c0d0;--text:#e8e0f0;--dim:#9080a8;--red:#ef4444;--redsub:#7f1d1d;}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+html,body{min-height:100vh;background:var(--void);color:var(--text);font-family:'Noto Serif JP',serif;overflow-x:hidden;}
+body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse 80% 60% at 50% -10%,rgba(107,33,168,.3) 0%,transparent 60%),radial-gradient(ellipse 50% 40% at 80% 80%,rgba(45,21,85,.35) 0%,transparent 55%);pointer-events:none;z-index:0;}
+#stars{position:fixed;inset:0;pointer-events:none;z-index:0;}
+.star{position:absolute;border-radius:50%;background:white;animation:twinkle var(--d,3s) ease-in-out infinite var(--delay,0s);}
+@keyframes twinkle{0%,100%{opacity:.1;transform:scale(1)}50%{opacity:var(--b,.7);transform:scale(1.3)}}
+
+#consent{position:fixed;inset:0;z-index:100;display:flex;align-items:center;justify-content:center;padding:20px;background:var(--void);}
+.cbox{width:100%;max-width:420px;background:linear-gradient(145deg,rgba(26,13,46,.97),rgba(13,8,24,.99));border:1px solid var(--gold);border-radius:20px;padding:32px 22px;text-align:center;box-shadow:0 0 60px rgba(107,33,168,.4);animation:floatIn .7s cubic-bezier(.16,1,.3,1);}
+@keyframes floatIn{from{opacity:0;transform:translateY(24px) scale(.97)}to{opacity:1;transform:none}}
+.orb-icon{font-size:48px;margin-bottom:12px;filter:drop-shadow(0 0 14px var(--gold));animation:pulse 3s ease-in-out infinite;}
+@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.07)}}
+.ctitle{font-family:'Cinzel Decorative',cursive;font-size:20px;color:var(--gold);letter-spacing:2px;margin-bottom:4px;}
+.csub{font-size:10px;color:var(--dim);letter-spacing:4px;margin-bottom:16px;text-transform:uppercase;}
+.cdesc{font-size:12px;line-height:1.9;color:var(--silver);margin-bottom:18px;font-family:'Noto Sans JP',sans-serif;font-weight:300;}
+.checklabel{display:flex;align-items:flex-start;gap:10px;background:rgba(212,175,55,.07);border:1px solid rgba(212,175,55,.25);border-radius:12px;padding:12px;margin-bottom:18px;cursor:pointer;text-align:left;}
+.checklabel input{width:18px;height:18px;min-width:18px;accent-color:var(--gold);margin-top:2px;}
+.checklabel span{font-size:11px;line-height:1.7;color:var(--silver);font-family:'Noto Sans JP',sans-serif;}
+.btnstart{width:100%;padding:14px;background:linear-gradient(135deg,#6b21a8,#9333ea,#d4af37);background-size:200% 200%;animation:bgrad 4s ease infinite;border:none;border-radius:50px;color:white;font-family:'Noto Serif JP',serif;font-size:14px;font-weight:600;letter-spacing:3px;cursor:pointer;box-shadow:0 4px 24px rgba(107,33,168,.5);transition:opacity .3s,transform .2s;}
+@keyframes bgrad{0%,100%{background-position:0% 50%}50%{background-position:100% 50%}}
+.btnstart:disabled{opacity:.3;cursor:not-allowed;}
+.btnstart:not(:disabled):active{transform:scale(.97);}
+
+#app{display:none;position:relative;z-index:1;min-height:100vh;}
+.header{text-align:center;padding:36px 20px 22px;}
+.header-orb{width:60px;height:60px;margin:0 auto 12px;border-radius:50%;background:radial-gradient(circle at 35% 35%,var(--gold2),var(--pglow),#1a0d2e);box-shadow:0 0 30px rgba(212,175,55,.5),0 0 60px rgba(147,51,234,.3);animation:orbBreathe 4s ease-in-out infinite;}
+@keyframes orbBreathe{0%,100%{transform:scale(1)}50%{transform:scale(1.06)}}
+.apptitle{font-family:'Cinzel Decorative',cursive;font-size:22px;color:var(--gold);letter-spacing:3px;text-shadow:0 0 20px rgba(212,175,55,.5);}
+.apptag{font-size:10px;color:var(--dim);letter-spacing:4px;margin-top:4px;text-transform:uppercase;}
+
+.tabs{display:flex;gap:6px;padding:0 14px 16px;overflow-x:auto;scrollbar-width:none;}
+.tabs::-webkit-scrollbar{display:none;}
+.tab{flex:0 0 auto;padding:8px 14px;border-radius:50px;border:1px solid rgba(212,175,55,.2);background:rgba(255,255,255,.03);color:var(--dim);font-family:'Noto Serif JP',serif;font-size:11px;cursor:pointer;white-space:nowrap;transition:all .3s;letter-spacing:1px;}
+.tab.active{background:linear-gradient(135deg,rgba(107,33,168,.6),rgba(212,175,55,.3));border-color:var(--gold);color:var(--gold2);box-shadow:0 0 12px rgba(212,175,55,.2);}
+
+.content{padding:0 14px 80px;}
+.panel{display:none;animation:fadeUp .4s cubic-bezier(.16,1,.3,1);}
+.panel.active{display:block;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+
+.card{background:linear-gradient(145deg,rgba(26,13,46,.8),rgba(13,8,24,.9));border:1px solid rgba(212,175,55,.2);border-radius:16px;padding:18px 15px;margin-bottom:12px;}
+.card-title{font-size:11px;color:var(--gold);letter-spacing:3px;margin-bottom:16px;display:flex;align-items:center;gap:8px;text-transform:uppercase;}
+.card-title::before,.card-title::after{content:'';flex:1;height:1px;}
+.card-title::before{background:linear-gradient(to right,transparent,var(--gold));}
+.card-title::after{background:linear-gradient(to left,transparent,var(--gold));}
+
+.fgroup{margin-bottom:12px;}
+.flabel{display:block;font-size:11px;color:var(--gold);letter-spacing:2px;margin-bottom:6px;font-family:'Noto Sans JP',sans-serif;}
+.finput,.ftextarea,.fselect{width:100%;background:rgba(255,255,255,.04);border:1px solid rgba(212,175,55,.2);border-radius:10px;padding:10px 13px;color:var(--text);font-family:'Noto Sans JP',sans-serif;font-size:14px;outline:none;transition:border-color .3s;-webkit-appearance:none;appearance:none;}
+.finput:focus,.ftextarea:focus,.fselect:focus{border-color:var(--pglow);}
+.ftextarea{resize:none;min-height:76px;line-height:1.7;}
+.fselect{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23d4af37' stroke-width='1.5' fill='none'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;padding-right:34px;cursor:pointer;}
+.fselect option{background:#1a0d2e;color:var(--text);}
+
+.btndivine{width:100%;padding:14px;background:linear-gradient(135deg,#4a0e8f,#7c3aed,#b8860b,#d4af37);background-size:300% 300%;animation:bgrad 5s ease infinite;border:1px solid var(--gold);border-radius:50px;color:#fef3c7;font-family:'Noto Serif JP',serif;font-size:13px;font-weight:600;letter-spacing:3px;cursor:pointer;margin-top:6px;box-shadow:0 4px 20px rgba(107,33,168,.4);transition:transform .2s;}
+.btndivine:active{transform:scale(.97);}
+/* 嘘発見ボタンは赤系 */
+.btndivine.red{background:linear-gradient(135deg,#7f1d1d,#dc2626,#b8860b,#d4af37);border-color:#ef4444;box-shadow:0 4px 20px rgba(239,68,68,.3);}
+
+.loading{display:none;text-align:center;padding:30px 20px;}
+.loading.show{display:block;}
+.crystal{width:64px;height:64px;margin:0 auto 14px;border-radius:50%;background:radial-gradient(circle at 35% 35%,rgba(240,208,96,.9),rgba(147,51,234,.8),rgba(26,13,46,.9));box-shadow:0 0 30px rgba(212,175,55,.4),0 0 60px rgba(147,51,234,.3),inset 0 0 20px rgba(0,0,0,.5);animation:crystalSpin 2s ease-in-out infinite;position:relative;}
+.crystal::before{content:'';position:absolute;top:10px;left:14px;width:16px;height:10px;background:rgba(255,255,255,.35);border-radius:50%;filter:blur(4px);transform:rotate(-30deg);}
+@keyframes crystalSpin{0%,100%{transform:scale(1) rotate(0deg)}25%{transform:scale(1.05) rotate(3deg)}75%{transform:scale(1.05) rotate(-3deg)}}
+.dots{display:flex;justify-content:center;gap:7px;margin-bottom:9px;}
+.dot{width:7px;height:7px;border-radius:50%;background:var(--gold);animation:dotBounce 1.4s ease-in-out infinite;}
+.dot:nth-child(2){animation-delay:.2s;background:var(--pglow);}
+.dot:nth-child(3){animation-delay:.4s;}
+@keyframes dotBounce{0%,80%,100%{transform:translateY(0);opacity:.4}40%{transform:translateY(-9px);opacity:1}}
+.loadtxt{font-size:11px;color:var(--dim);letter-spacing:3px;animation:txtPulse 2s ease-in-out infinite;}
+@keyframes txtPulse{0%,100%{opacity:.5}50%{opacity:1}}
+
+.result{display:none;animation:fadeUp .5s cubic-bezier(.16,1,.3,1);}
+.result.show{display:block;}
+.res-header{text-align:center;padding:14px 0 10px;}
+.res-title{font-family:'Cinzel Decorative',cursive;font-size:12px;color:var(--gold);letter-spacing:3px;}
+.divider{height:1px;background:linear-gradient(to right,transparent,var(--gold),transparent);margin:8px 0;}
+.ritem{background:linear-gradient(145deg,rgba(45,21,85,.4),rgba(13,8,24,.6));border:1px solid rgba(212,175,55,.15);border-radius:13px;padding:14px 13px;margin-bottom:9px;position:relative;overflow:hidden;}
+.ritem::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(to right,transparent,var(--pglow),transparent);}
+.ritem.danger{border-color:rgba(239,68,68,.3);background:linear-gradient(145deg,rgba(127,29,29,.3),rgba(13,8,24,.7));}
+.ritem.danger::before{background:linear-gradient(to right,transparent,#ef4444,transparent);}
+.rlabel{font-size:10px;color:var(--gold);letter-spacing:2px;text-transform:uppercase;margin-bottom:7px;font-family:'Noto Sans JP',sans-serif;display:flex;align-items:center;gap:6px;}
+.rlabel.red{color:#f87171;}
+.rtext{font-size:13px;line-height:1.9;color:var(--text);font-weight:300;}
+.bar-wrap{margin-top:7px;}
+.bar-row{display:flex;justify-content:space-between;font-size:10px;color:var(--dim);margin-bottom:4px;font-family:'Noto Sans JP',sans-serif;}
+.bar-track{height:7px;background:rgba(255,255,255,.06);border-radius:50px;overflow:hidden;}
+.bar-fill{height:100%;border-radius:50px;background:linear-gradient(to right,var(--pglow),var(--gold));transition:width 1.5s cubic-bezier(.16,1,.3,1);width:0%;}
+.bar-fill.red{background:linear-gradient(to right,#7f1d1d,#ef4444);}
+.disclaimer{font-size:10px;color:var(--dim);text-align:center;padding:8px 16px 18px;line-height:1.8;font-family:'Noto Sans JP',sans-serif;font-weight:300;}
+
+.particle{position:fixed;pointer-events:none;border-radius:50%;animation:pFloat linear infinite;z-index:0;}
+@keyframes pFloat{0%{transform:translateY(100vh) rotate(0deg);opacity:0}10%{opacity:1}90%{opacity:1}100%{transform:translateY(-10vh) rotate(360deg);opacity:0}}
+</style>
+</head>
+<body>
+<div id="stars"></div>
+
+<div id="consent">
+  <div class="cbox">
+    <div class="orb-icon">🔮</div>
+    <div class="ctitle">心透視AI</div>
+    <div class="csub">Psychic · Heart · AI</div>
+    <p class="cdesc">未来透視・本音解析・嘘発見・深層心理<br>あなたの疑問をAIが深く読み解きます。</p>
+    <label class="checklabel">
+      <input type="checkbox" id="chk" onchange="document.getElementById('btngo').disabled=!this.checked">
+      <span>このアプリはエンタメ・自己理解を目的としたものです。医療・法律・投資の断定ではありません。最終判断はご自身の責任で行います。</span>
+    </label>
+    <button class="btnstart" id="btngo" disabled onclick="startApp()">✦ 鑑定を始める ✦</button>
+  </div>
+</div>
+
+<div id="app">
+  <div class="header">
+    <div class="header-orb"></div>
+    <div class="apptitle">心透視AI</div>
+    <div class="apptag">Psychic · Heart · AI</div>
+  </div>
+
+  <div class="tabs">
+    <button class="tab active" onclick="showTab('future',this)">🔮 未来透視</button>
+    <button class="tab" onclick="showTab('heart',this)">💜 本音解析</button>
+    <button class="tab" onclick="showTab('lie',this)">🚨 嘘発見</button>
+    <button class="tab" onclick="showTab('growth',this)">✨ 気づき発見</button>
+  </div>
+
+  <div class="content">
+
+    <!-- 未来透視 -->
+    <div class="panel active" id="panel-future">
+      <div class="card">
+        <div class="card-title">未来透視AI</div>
+        <div class="fgroup"><label class="flabel">▸ お名前</label><input class="finput" id="f-name" type="text" placeholder="例：さくら" maxlength="20"></div>
+        <div class="fgroup"><label class="flabel">▸ 年齢</label><input class="finput" id="f-age" type="number" placeholder="例：28" min="1" max="120"></div>
+        <div class="fgroup"><label class="flabel">▸ 今の悩み</label><textarea class="ftextarea" id="f-worry" placeholder="現在抱えている悩みや状況をお聞かせください"></textarea></div>
+        <div class="fgroup">
+          <label class="flabel">▸ 相談ジャンル</label>
+          <select class="fselect" id="f-genre">
+            <option value="">選択してください</option>
+            <option value="恋愛・結婚">❤️ 恋愛・結婚</option>
+            <option value="仕事・キャリア">💼 仕事・キャリア</option>
+            <option value="人間関係">🤝 人間関係</option>
+            <option value="お金・財運">💰 お金・財運</option>
+            <option value="健康・ライフスタイル">🌿 健康・ライフスタイル</option>
+            <option value="自己成長・目標">🌟 自己成長・目標</option>
+          </select>
+        </div>
+        <button class="btndivine" onclick="divine('future')">✦ 未来を透視する ✦</button>
+      </div>
+      <div class="loading" id="load-future"><div class="crystal"></div><div class="dots"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div><div class="loadtxt">未来の扉を開いています…</div></div>
+      <div class="result" id="res-future"><div class="res-header"><div class="res-title">✦ 透視結果 ✦</div><div class="divider"></div></div><div id="res-future-c"></div><p class="disclaimer">※ エンタメ・自己理解を目的としたものです</p></div>
+    </div>
+
+    <!-- 本音解析 -->
+    <div class="panel" id="panel-heart">
+      <div class="card">
+        <div class="card-title">本音解析AI</div>
+        <div class="fgroup">
+          <label class="flabel">▸ 相手との関係</label>
+          <select class="fselect" id="h-relation">
+            <option value="">選択してください</option>
+            <option value="気になる人">💗 気になる人</option>
+            <option value="恋人・彼氏・彼女">💑 恋人・彼氏・彼女</option>
+            <option value="元カレ・元カノ">💔 元カレ・元カノ</option>
+            <option value="友人">🤝 友人</option>
+            <option value="職場の人">💼 職場の人</option>
+            <option value="家族">🏠 家族</option>
+          </select>
+        </div>
+        <div class="fgroup"><label class="flabel">▸ 相手から来た言葉・文章</label><textarea class="ftextarea" id="h-message" placeholder="相手からのLINEや言葉をそのまま入力してください"></textarea></div>
+        <div class="fgroup"><label class="flabel">▸ 今の状況・背景</label><textarea class="ftextarea" id="h-situation" placeholder="二人の最近の状況や経緯を教えてください"></textarea></div>
+        <button class="btndivine" onclick="divine('heart')">✦ 本音を解析する ✦</button>
+      </div>
+      <div class="loading" id="load-heart"><div class="crystal"></div><div class="dots"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div><div class="loadtxt">心の声を読み解いています…</div></div>
+      <div class="result" id="res-heart"><div class="res-header"><div class="res-title">✦ 本音解析結果 ✦</div><div class="divider"></div></div><div id="res-heart-c"></div><p class="disclaimer">※ エンタメ・自己理解を目的としたものです</p></div>
+    </div>
+
+    <!-- 嘘発見・深層心理 -->
+    <div class="panel" id="panel-lie">
+      <div class="card">
+        <div class="card-title">🚨 嘘発見・深層心理AI</div>
+        <div class="fgroup">
+          <label class="flabel">▸ 相手との関係</label>
+          <select class="fselect" id="l-relation">
+            <option value="">選択してください</option>
+            <option value="彼氏">💔 彼氏</option>
+            <option value="彼女">💔 彼女</option>
+            <option value="夫・旦那">💍 夫・旦那</option>
+            <option value="妻・奥さん">💍 妻・奥さん</option>
+            <option value="気になる人">💗 気になる人</option>
+            <option value="友人">🤝 友人</option>
+            <option value="職場の人">💼 職場の人</option>
+          </select>
+        </div>
+        <div class="fgroup"><label class="flabel">▸ 相手が言った言葉（そのまま貼り付け）</label><textarea class="ftextarea" id="l-words" placeholder="例：「残業だから遅くなる」「友達と飲んでた」など、気になる言葉をそのまま入力してください"></textarea></div>
+        <div class="fgroup"><label class="flabel">▸ そのときの状況・行動・態度</label><textarea class="ftextarea" id="l-situation" placeholder="例：目を合わせなかった、スマホを隠した、返信が急に遅くなった、など"></textarea></div>
+        <div class="fgroup"><label class="flabel">▸ 最近の変化（気になること）</label><textarea class="ftextarea" id="l-change" placeholder="例：急に帰りが遅くなった、優しくなった、逆に冷たくなった、など"></textarea></div>
+        <button class="btndivine red" onclick="divine('lie')">🔍 嘘・深層心理を暴く</button>
+      </div>
+      <div class="loading" id="load-lie"><div class="crystal"></div><div class="dots"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div><div class="loadtxt">深層心理を分析しています…</div></div>
+      <div class="result" id="res-lie"><div class="res-header"><div class="res-title">🚨 深層心理解析結果</div><div class="divider"></div></div><div id="res-lie-c"></div><p class="disclaimer">※ エンタメ目的です。確定的な判断はできません。大切な判断はご自身で。</p></div>
+    </div>
+
+    <!-- 気づき発見 -->
+    <div class="panel" id="panel-growth">
+      <div class="card">
+        <div class="card-title">気づき・良い点発見AI</div>
+        <div class="fgroup"><label class="flabel">▸ 今の悩み</label><textarea class="ftextarea" id="g-worry" placeholder="今感じている悩みや不安を教えてください"></textarea></div>
+        <div class="fgroup"><label class="flabel">▸ 最近あった出来事</label><textarea class="ftextarea" id="g-event" placeholder="最近印象に残った出来事をお聞かせください"></textarea></div>
+        <div class="fgroup"><label class="flabel">▸ 自分で気になること</label><textarea class="ftextarea" id="g-interest" placeholder="自分のどんな部分が気になりますか？"></textarea></div>
+        <button class="btndivine" onclick="divine('growth')">✦ 自分を発見する ✦</button>
+      </div>
+      <div class="loading" id="load-growth"><div class="crystal"></div><div class="dots"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div><div class="loadtxt">あなたの輝きを探しています…</div></div>
+      <div class="result" id="res-growth"><div class="res-header"><div class="res-title">✦ 気づきの結果 ✦</div><div class="divider"></div></div><div id="res-growth-c"></div><p class="disclaimer">※ エンタメ・自己理解を目的としたものです</p></div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+(function(){
+  const c=document.getElementById('stars');
+  for(let i=0;i<70;i++){
+    const s=document.createElement('div');s.className='star';
+    const sz=Math.random()*2.5+.5;
+    s.style.cssText=`width:${sz}px;height:${sz}px;top:${Math.random()*100}%;left:${Math.random()*100}%;--d:${2+Math.random()*4}s;--delay:${Math.random()*4}s;--b:${.4+Math.random()*.6}`;
+    c.appendChild(s);
+  }
+  const cols=['rgba(212,175,55,.4)','rgba(147,51,234,.4)','rgba(192,192,208,.3)'];
+  for(let i=0;i<6;i++){
+    const p=document.createElement('div');p.className='particle';
+    const sz=Math.random()*4+2;
+    p.style.cssText=`width:${sz}px;height:${sz}px;left:${Math.random()*100}%;background:${cols[Math.floor(Math.random()*cols.length)]};animation-duration:${8+Math.random()*12}s;animation-delay:${Math.random()*10}s`;
+    document.body.appendChild(p);
+  }
+})();
+
+function startApp(){document.getElementById('consent').style.display='none';document.getElementById('app').style.display='block';window.scrollTo(0,0);}
+function showTab(name,btn){document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));document.querySelectorAll('.tab').forEach(b=>b.classList.remove('active'));document.getElementById('panel-'+name).classList.add('active');btn.classList.add('active');}
+
+function hash(str){let h=0;for(let i=0;i<str.length;i++)h=(h<<5)-h+str.charCodeAt(i)|0;return Math.abs(h);}
+function pick(arr,s){return arr[s%arr.length];}
+function ri(icon,label,text,danger){return `<div class="ritem${danger?' danger':''}"><div class="rlabel${danger?' red':''}">${icon} ${label}</div><div class="rtext">${text}</div></div>`;}
+function bar(label,comment,rate,red,id){return `<div class="ritem${red?' danger':''}"><div class="rlabel${red?' red':''}">${label}</div><div class="bar-wrap"><div class="bar-row"><span>${comment}</span><span>${rate}%</span></div><div class="bar-track"><div class="bar-fill${red?' red':''}" id="${id}" style="width:0%"></div></div></div></div>`;}
+
+// 未来透視
+function genFuture(name,age,worry,genre){
+  const s=hash(name+worry+genre);
+  const flows=[
+    `${name}さんの周囲では今、静かながらも着実なエネルギーの変化が起きています。${genre}の悩みを抱えるこの時期は、大きな転換点の手前。焦らず自分のペースを保つことで、3週間以内に状況が動き始めるでしょう。`,
+    `現在、${name}さんのエネルギーは内側に向かって蓄積されている段階です。${genre}の悩みは、より深い自己理解へと導く試練。近いうちに、思いがけない形で答えが見えてきます。`,
+    `${name}さんの波動は今、上昇の兆しを見せています。${genre}の課題に向き合ってきたことで、内なる強さが育まれていました。この先1ヶ月は特に重要な変化の時期です。`,
+    `${name}さんを取り巻く状況は、今まさに変化の季節を迎えています。${genre}の悩みの奥に、大切な気づきが隠されています。`,
+  ];
+  const cautions=[
+    `感情的な判断は避けた方が賢明です。${worry.slice(0,8)}に関連する場面では衝動的な言動が後悔を生む可能性があります。一歩引いた視点で物事を見ましょう。`,
+    `周囲の意見に流されすぎることへの注意が必要です。自分の軸をしっかり持ち、他者の言葉に振り回されないことが大切です。`,
+    `焦りが判断を曇らせる時期です。急いで結果を求めると本来の流れを乱してしまうかもしれません。今は種まきの時と心得て。`,
+    `他者と自分を比べることで不必要な焦りが生まれています。あなたにはあなただけのペースと道があることを忘れないで。`,
+  ];
+  const chances=[
+    `思わぬところからのご縁が、${genre}の問題を解決するヒントをもたらします。朝の時間帯に重要なインスピレーションが訪れやすい暗示があります。`,
+    `デジタル上での繋がりや情報収集から突破口が見えてきます。週の中頃から末にかけて${genre}に関する朗報が届く可能性が高いです。`,
+    `長い間温めてきたアイデアを今こそ形にする時です。一歩踏み出すことで、新しい流れが生まれます。`,
+    `過去に出会った人物が、今の課題の解決キーとなる可能性があります。直感が冴える時期なのでピンと来たことは行動に移して。`,
+  ];
+  const actions=[
+    `毎朝起きてすぐに今日大切にしたいことを紙に書いてみましょう。書くことで潜在意識が活性化し、引き寄せの力が強まります。`,
+    `今週中に${genre}に関連した新しい知識や情報を積極的に収集してみましょう。学ぶ姿勢がエネルギーを高め、状況を動かす触媒となります。`,
+    `感謝の気持ちを意識的に表現することを習慣にしましょう。小さなことへの感謝が周囲のエネルギーを浄化し、良い縁を引き寄せます。`,
+    `自分へのご褒美を設定してみましょう。小さな達成に対しても喜ぶ習慣が、更なるモチベーションと幸運を呼び込みます。`,
+  ];
+  const msgs=[
+    `あなたが感じている不安は、変化への扉を前にした証。その扉の向こうに、輝く未来が待っています。`,
+    `悩みの深さは、あなたの真剣さの証明。その姿勢こそが最大の武器です。`,
+    `今は冬の前夜。必ず春は来る。あなたの努力は必ず大きな実りとなります。`,
+    `迷いがあるということは、それだけ大切に考えているということ。その慎重さがあなたを守ります。`,
+  ];
+  return {flow:pick(flows,s),caution:pick(cautions,s+1),chance:pick(chances,s+2),action:pick(actions,s+3),message:pick(msgs,s+4)};
+}
+
+// 本音解析
+function genHeart(relation,message,situation){
+  const s=hash(relation+message+situation);
+  const feelings=[
+    `「${message.slice(0,14)}」という言葉の裏には、複雑な感情が隠れています。${relation}として関係を大切にしたい気持ちはありますが、同時に迷いや不安も抱えています。`,
+    `相手の言葉には直接言えない本音が含まれています。${relation}という関係の中で、あなたへの関心は確かに存在しますが、感情の整理がついていない様子です。`,
+    `「${message.slice(0,12)}」の奥に、あなたへの期待と不安が共存しています。距離感をどう保つべきか模索中の状態です。`,
+    `相手の心中は表に出ている以上に複雑です。${relation}としてあなたに特別な感情を持っていることは確かですが、素直に表現する勇気がまだ足りていません。`,
+  ];
+  const pulseRates=[45,58,62,71,55,68,75,42,80];
+  const pulseComments=['様子見ですが関心はあります','少しずつ距離が縮まっています','確かな関心が感じられます','前向きなサインが出ています','慎重ながらも気にかけています','関係が深まりつつある状態です','強い関心を持っているようです','まだ関係構築の初期段階です','とても良いエネルギーを感じます'];
+  const cautions=[
+    `焦って関係を進めようとすると逆効果になる可能性があります。今は自然な流れを大切に。`,
+    `相手の反応を深読みしすぎることへの注意が必要です。ありのままを受け取る練習をしてみましょう。`,
+    `他者の意見や噂話に振り回されないことが大切です。直接のやりとりを大切にしましょう。`,
+    `自分を犠牲にして相手に合わせすぎていませんか？自分の軸を保つことが重要です。`,
+  ];
+  const actions=[
+    `自分自身の感情を整理することが先決です。相手が話しやすい雰囲気を作り、日常の小さな会話から始めることが信頼関係を深める近道です。`,
+    `相手の好きなことに関する話題を自然に持ち出してみましょう。共通の話題が壁を取り除く最も自然な方法です。`,
+    `今週は相手への直接アクションより自分磨きに時間を使いましょう。あなたが輝いているとき相手は自然と引き寄せられます。`,
+    `さりげなく相手の話に耳を傾ける機会を作りましょう。アドバイスより共感を優先することで絆が深まります。`,
+  ];
+  const advices=[
+    `どんな結果になってもあなたの価値は変わりません。相手の反応に一喜一憂せず、まず自分を大切にすることが、最終的に良い関係を引き寄せます。`,
+    `タイミングがとても大切です。焦らず誠実な姿勢と温かい心で接し続けることが、やがて大きな花を咲かせます。`,
+    `自分らしくいることがあなたの最大の武器です。ありのままのあなたでいることで、本当に相性の良い関係が育まれます。`,
+    `人との縁は準備が整った時に自然に動き始めます。今は喜びに満ちた自分の幸せを追求することに集中して。`,
+  ];
+  const pr=pulseRates[s%pulseRates.length];
+  return{true_feeling:pick(feelings,s),pulse_rate:pr,pulse_comment:pulseComments[s%pulseComments.length],caution:pick(cautions,s+1),action:pick(actions,s+2),advice:pick(advices,s+3)};
+}
+
+// 嘘発見・深層心理
+function genLie(relation,words,situation,change){
+  const s=hash(relation+words+situation+change);
+
+  const lieRates=[28,42,55,63,71,78,85,38,68];
+  const lieRate=lieRates[s%lieRates.length];
+  const lieLevel=lieRate>=70?'高い':lieRate>=50?'中程度':'低め';
+  const lieColor=lieRate>=70?'high':'low';
+
+  const contradictions=[
+    `「${words.slice(0,12)}」という言葉に注目すると、言葉と行動の間に微妙なズレが見られます。${situation.slice(0,10)}という状況と照らし合わせると、説明に一貫性が欠けている可能性があります。心理学的に、嘘をついている人は細部を曖昧にする傾向があります。`,
+    `言葉の選び方に防衛的なパターンが見られます。「${words.slice(0,10)}」という表現は、質問をかわすための合理化の可能性があります。また${change.slice(0,10)}という変化は、後ろめたさからくる行動変容と一致することがあります。`,
+    `発言の中に過度な説明や言い訳が含まれている場合、心理学では「デセプション・キュー」と呼ばれるサインとなります。${situation.slice(0,12)}という状況を考えると、真実を隠すための防衛機制が働いている可能性が否定できません。`,
+    `「${words.slice(0,12)}」は表面上は自然に見えますが、${change.slice(0,10)}という最近の変化と組み合わせると、整合性に疑問が生じます。人は嘘をつくとき、無意識に過去形を多用したり、主語を避ける傾向があります。`,
+  ];
+
+  const psychologies=[
+    `【回避型愛着行動】相手は感情的な対立を避けようとする傾向が見られます。問い詰められることへの恐怖から、曖昧な表現や話題転換を行う可能性があります。\n\n【投影】自分が後ろめたいことがあるとき、逆にあなたを責めたり疑ったりする行動が出やすくなります。\n\n【合理化】自分の行動を正当化するために、もっともらしい理由を後付けする心理が働いている可能性があります。`,
+    `【ガスライティングの兆候】あなたの感覚や記憶を否定するような言動が見られる場合、これは心理的操作の一種です。「そんなこと言ってない」「気のせいだよ」という言葉には注意が必要です。\n\n【防衛機制（否認）】都合の悪い現実を認めたくないために、事実を否定する心理が働いている可能性があります。`,
+    `【ダブルバインド】あなたを混乱させるような矛盾したメッセージを送る行動が見られます。優しくしたかと思えば急に冷たくなるパターンは、相手自身も感情が定まっていないサインです。\n\n【解離】罪悪感から逃げるために、感情を切り離して何事もなかったように振る舞う防衛機制が作動している可能性があります。`,
+    `【不安型愛着】相手は関係を失う恐怖と、自分の欲求の間で揺れている可能性があります。嘘は関係を保つための手段として用いられることがあります。\n\n【選択的情報開示】すべてを隠すのではなく、都合のいい部分だけを伝える「半分の嘘」が使われている可能性があります。これは発見されにくい欺瞞の形です。`,
+  ];
+
+  const warnings=[
+    `最も注意すべきサイン：${change.slice(0,10)}という変化は、何かを隠している人に共通して見られるパターンです。スマホを常に伏せて置く・以前より帰宅が遅い・理由を聞くと過度に防衛的になる、これらが重なる場合は慎重な対応が必要です。`,
+    `${situation.slice(0,10)}という状況での行動変容は要注意です。急に優しくなった場合は罪悪感の裏返し、逆に冷たくなった場合は感情的距離を置こうとしているサインの可能性があります。どちらも突然の変化が続く場合は注意が必要です。`,
+    `言語的サインとして「絶対に」「本当に」「信じて」などの強調表現を多用する場合、心理学では過補償（嘘を信じさせようとする無意識の努力）の可能性があります。また目を合わせない・声のトーンが変わるなど非言語サインも重要です。`,
+    `コミュニケーションパターンの変化に注目してください。以前はすぐ返信が来ていたのに遅くなった・話題を変えるのが早くなった・特定の場所や人の話になると緊張する、これらは複合的に判断する必要があります。`,
+  ];
+
+  const advices=[
+    `まず大切なのは、感情的にならず冷静に事実を確認することです。「あなたを責めているわけじゃない」という姿勢で話し合う場を作りましょう。ただし、どんな結果であってもあなた自身の価値は変わりません。自分を大切にすることが最優先です。`,
+    `疑いの気持ちが強い場合は、まずあなた自身の感情を整理することが大切です。直接対話の前に、信頼できる友人や専門家に相談することも選択肢の一つです。一人で抱え込まないでください。`,
+    `証拠を集めることより、関係性そのものについて向き合う時間を持つことをお勧めします。「なぜ嘘をつく必要があったのか」という根本的な問いが、二人の関係の本質を明らかにします。`,
+    `あなたの直感は正しい可能性があります。しかし行動を起こす前に、感情が落ち着いている状態で冷静に判断することが重要です。後悔しない選択のために、焦らず慎重に。`,
+  ];
+
+  return{
+    lie_rate:lieRate,
+    lie_level:lieLevel,
+    contradiction:pick(contradictions,s),
+    psychology:pick(psychologies,s+1),
+    warning:pick(warnings,s+2),
+    advice:pick(advices,s+3),
+  };
+}
+
+// 気づき発見
+function genGrowth(worry,event,interest){
+  const s=hash(worry+event+interest);
+  const strengths=[
+    `物事を深く考え本質を見抜く力が備わっています。${worry.slice(0,8)}に悩んでいることからも分かるように、表面だけでなく本質に向き合う誠実さは、多くの人が持っていない貴重な才能です。`,
+    `人の気持ちに寄り添う共感力が最大の強みです。${event.slice(0,8)}のような経験を通じて培われた感受性は、誰からも信頼される存在にしています。`,
+    `どんな困難でも諦めずに向き合う忍耐力と粘り強さが備わっています。その姿勢が周囲から尊敬を集めています。`,
+    `細部まで丁寧に気を配る観察力と繊細さが大きな魅力です。多くの人が見落とす小さなことに気づける特別な能力です。`,
+  ];
+  const talents=[
+    `人をまとめ導くリーダーシップという隠れた才能があります。あなたの言葉には不思議と人を安心させる力があります。`,
+    `創造性と表現力という隠れた才能があります。${interest.slice(0,8)}への関心がその証明です。何らかの形で自己表現を始めることで新たな才能の扉が開きます。`,
+    `直感力と洞察力が隠れた才能です。その直感を信頼して積極的に使うことで、困難な状況でも最善の判断が下せます。`,
+    `人の可能性を引き出す力が隠れています。教えること・サポートすること・人の成長を助ける分野でその才能が輝きます。`,
+  ];
+  const awarenesses=[
+    `今の悩みは、次のステージへ進む準備ができているというサインです。この壁を乗り越えることで、想像もしていなかった新しい自分に出会えるでしょう。`,
+    `感じている不満や違和感は、本来の自分らしさを求める魂の声です。今こそ本当にやりたいことに正直になる時です。`,
+    `悩みの中にこそ本当の価値観が隠れています。何が辛いかを知ることは、何が大切かを知ること。優先順位を整理し直してみましょう。`,
+    `今感じているモヤモヤは、変化を恐れる心と変わりたい心の葛藤です。恐れを感じながらも一歩踏み出す勇気が新しい世界を開きます。`,
+  ];
+  const steps=[
+    `毎晩寝る前に「今日のよかったこと」を3つ書き出す習慣をつけましょう。小さな成功体験の積み重ねが自己肯定感を高めます。`,
+    `ずっと後回しにしていたことを今週中に一つ片付けてみましょう。「やれた」という体験があなたの背中を押してくれます。`,
+    `信頼できる人に今の気持ちを素直に話してみましょう。声に出すことで気持ちが整理され新しい視点も得られます。`,
+    `「楽しい」「ワクワクする」と感じることを今週一つだけ実行してみましょう。喜びのエネルギーが停滞した状況を動かします。`,
+  ];
+  const cheers=[
+    `あなたが感じている悩みは、より大きな自分へと成長するための階段です。一歩ずつ、確実に前へ。`,
+    `あなたの中には、まだ誰も知らない可能性が眠っています。それを信じて、今日も一歩踏み出して。`,
+    `悩めるあなたは、それだけ真剣に生きているということ。その真剣さが、あなたを輝かせる源です。`,
+    `完璧じゃなくていい。今のあなたのままで、十分に素晴らしい。`,
+  ];
+  return{strength:pick(strengths,s),talent:pick(talents,s+1),awareness:pick(awarenesses,s+2),step:pick(steps,s+3),cheer:pick(cheers,s+4)};
+}
+
+function divine(section){
+  const loadEl=document.getElementById('load-'+section);
+  const resEl=document.getElementById('res-'+section);
+  const contentEl=document.getElementById('res-'+section+'-c');
+
+  if(section==='future'){
+    if(!document.getElementById('f-name').value.trim()||!document.getElementById('f-age').value.trim()||!document.getElementById('f-worry').value.trim()||!document.getElementById('f-genre').value){alert('全ての項目を入力してください');return;}
+  }
+  if(section==='heart'){
+    if(!document.getElementById('h-relation').value||!document.getElementById('h-message').value.trim()||!document.getElementById('h-situation').value.trim()){alert('全ての項目を入力してください');return;}
+  }
+  if(section==='lie'){
+    if(!document.getElementById('l-relation').value||!document.getElementById('l-words').value.trim()||!document.getElementById('l-situation').value.trim()||!document.getElementById('l-change').value.trim()){alert('全ての項目を入力してください');return;}
+  }
+  if(section==='growth'){
+    if(!document.getElementById('g-worry').value.trim()||!document.getElementById('g-event').value.trim()||!document.getElementById('g-interest').value.trim()){alert('全ての項目を入力してください');return;}
+  }
+
+  loadEl.classList.add('show');
+  resEl.classList.remove('show');
+  loadEl.scrollIntoView({behavior:'smooth',block:'nearest'});
+
+  const delay=2200+Math.random()*1000;
+  setTimeout(()=>{
+    let html='',data,pfId='pf'+Date.now();
+    if(section==='future'){
+      data=genFuture(document.getElementById('f-name').value.trim(),document.getElementById('f-age').value.trim(),document.getElementById('f-worry').value.trim(),document.getElementById('f-genre').value);
+      html=ri('🌊','今日からの流れ',data.flow)+ri('⚠️','注意すること',data.caution)+ri('✨','チャンス',data.chance)+ri('🔑','開運行動',data.action)+ri('💫','一言メッセージ',data.message);
+    }
+    if(section==='heart'){
+      data=genHeart(document.getElementById('h-relation').value,document.getElementById('h-message').value.trim(),document.getElementById('h-situation').value.trim());
+      html=ri('💜','相手の本音',data.true_feeling)+bar('💗 脈あり度',data.pulse_comment,data.pulse_rate,false,pfId)+ri('⚡','注意点',data.caution)+ri('🎯','今どう動くべきか',data.action)+ri('🌸','優しいアドバイス',data.advice);
+    }
+    if(section==='lie'){
+      data=genLie(document.getElementById('l-relation').value,document.getElementById('l-words').value.trim(),document.getElementById('l-situation').value.trim(),document.getElementById('l-change').value.trim());
+      const isHigh=data.lie_rate>=70;
+      html=bar(`🚨 嘘の可能性【${data.lie_level}】`,isHigh?'⚠️ 注意が必要なレベルです':'慎重に様子を見ましょう',data.lie_rate,true,pfId)
+          +ri('🔍','言葉の矛盾・欺瞞のサイン',data.contradiction,isHigh)
+          +`<div class="ritem${isHigh?' danger':''}"><div class="rlabel${isHigh?' red':''}">🧠 深層心理・防衛機制の分析</div><div class="rtext">${data.psychology.replace(/\n/g,'<br>')}</div></div>`
+          +ri('⚠️','注意すべき行動パターン',data.warning,isHigh)
+          +ri('💜','あなたへのアドバイス',data.advice);
+    }
+    if(section==='growth'){
+      data=genGrowth(document.getElementById('g-worry').value.trim(),document.getElementById('g-event').value.trim(),document.getElementById('g-interest').value.trim());
+      html=ri('🌟','あなたの良い点',data.strength)+ri('💎','隠れた才能',data.talent)+ri('🌿','今の気づき',data.awareness)+ri('👣','前向きな一歩',data.step)+ri('🔥','応援メッセージ',data.cheer);
+    }
+    contentEl.innerHTML=html;
+    loadEl.classList.remove('show');
+    resEl.classList.add('show');
+    setTimeout(()=>{const pf=document.getElementById(pfId);if(pf){const rate=(section==='heart'?data.pulse_rate:data.lie_rate);pf.style.width=rate+'%';}},200);
+    resEl.scrollIntoView({behavior:'smooth',block:'start'});
+  },delay);
+}
+</script>
+</body>
+</html>
