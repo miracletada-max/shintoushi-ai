@@ -110,7 +110,7 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
     <div class="orb-icon">🔮</div>
     <div class="ctitle">心透視AI</div>
     <div class="csub">Psychic · Heart · AI</div>
-    <p class="cdesc">未来透視・本音解析・嘘発見・深層心理<br>あなたの疑問をAIが深く読み解きます。</p>
+    <p class="cdesc">言葉分析・心理傾向分析・良い点発見・助け合う言葉<br>あなたの疑問をAIが深く読み解きます。</p>
     <label class="checklabel">
       <input type="checkbox" id="chk" onchange="document.getElementById('btngo').disabled=!this.checked">
       <span>このアプリはエンタメ・自己理解を目的としたものです。医療・法律・投資の断定ではありません。最終判断はご自身の責任で行います。</span>
@@ -129,7 +129,7 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
   <div class="tabs">
     <button class="tab active" onclick="showTab('future',this)">🔮 言葉分析</button>
     <button class="tab" onclick="showTab('heart',this)">💜 心理傾向分析</button>
-    <button class="tab" onclick="showTab('lie',this)">🚨 良い点発見</button>
+    <button class="tab" onclick="showTab('lie',this)">🌸　良い点発見</button>
     <button class="tab" onclick="showTab('growth',this)">✨ 助け合う言葉</button>
   </div>
 
@@ -138,7 +138,7 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
     <!-- 未来透視 -->
     <div class="panel active" id="panel-future">
       <div class="card">
-        <div class="card-title">未来透視AI</div>
+        <div class="card-title">言葉分析AI</div>
         <div class="fgroup"><label class="flabel">▸ お名前</label><input class="finput" id="f-name" type="text" placeholder="例：さくら" maxlength="20"></div>
         <div class="fgroup"><label class="flabel">▸ 年齢</label><input class="finput" id="f-age" type="number" placeholder="例：28" min="1" max="120"></div>
         <div class="fgroup"><label class="flabel">▸ 今の悩み</label><textarea class="ftextarea" id="f-worry" placeholder="現在抱えている悩みや状況をお聞かせください"></textarea></div>
@@ -154,7 +154,7 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
             <option value="自己成長・目標">🌟 自己成長・目標</option>
           </select>
         </div>
-        <button class="btndivine" onclick="divine('future')">✦ 未来を透視する ✦</button>
+        <button class="btndivine" onclick="divine('future')">✦ 心理傾向分析する ✦</button>
       </div>
       <div class="loading" id="load-future"><div class="crystal"></div><div class="dots"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div><div class="loadtxt">未来の扉を開いています…</div></div>
       <div class="result" id="res-future"><div class="res-header"><div class="res-title">✦ 透視結果 ✦</div><div class="divider"></div></div><div id="res-future-c"></div><p class="disclaimer">※ エンタメ・自己理解を目的としたものです</p></div>
@@ -163,7 +163,7 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
     <!-- 本音解析 -->
     <div class="panel" id="panel-heart">
       <div class="card">
-        <div class="card-title">本音解析AI</div>
+        <div class="card-title">心理傾向分析AI</div>
         <div class="fgroup">
           <label class="flabel">▸ 相手との関係</label>
           <select class="fselect" id="h-relation">
@@ -178,16 +178,16 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
         </div>
         <div class="fgroup"><label class="flabel">▸ 相手から来た言葉・文章</label><textarea class="ftextarea" id="h-message" placeholder="相手からのLINEや言葉をそのまま入力してください"></textarea></div>
         <div class="fgroup"><label class="flabel">▸ 今の状況・背景</label><textarea class="ftextarea" id="h-situation" placeholder="二人の最近の状況や経緯を教えてください"></textarea></div>
-        <button class="btndivine" onclick="divine('heart')">✦ 本音を解析する ✦</button>
+        <button class="btndivine" onclick="divine('heart')">✦ 心理傾向分析する ✦</button>
       </div>
       <div class="loading" id="load-heart"><div class="crystal"></div><div class="dots"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div><div class="loadtxt">心の声を読み解いています…</div></div>
       <div class="result" id="res-heart"><div class="res-header"><div class="res-title">✦ 本音解析結果 ✦</div><div class="divider"></div></div><div id="res-heart-c"></div><p class="disclaimer">※ エンタメ・自己理解を目的としたものです</p></div>
     </div>
 
-    <!-- 嘘発見・深層心理 -->
+    <!-- 良い点発見・深層心理 -->
     <div class="panel" id="panel-lie">
       <div class="card">
-        <div class="card-title">🚨 嘘発見・深層心理AI</div>
+        <div class="card-title">🌸　良い点発見・深層心理AI</div>
         <div class="fgroup">
           <label class="flabel">▸ 相手との関係</label>
           <select class="fselect" id="l-relation">
@@ -204,13 +204,13 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
         <div class="fgroup"><label class="flabel">▸ 相手が言った言葉（そのまま貼り付け）</label><textarea class="ftextarea" id="l-words" placeholder="例：「残業だから遅くなる」「友達と飲んでた」など、気になる言葉をそのまま入力してください"></textarea></div>
         <div class="fgroup"><label class="flabel">▸ そのときの状況・行動・態度</label><textarea class="ftextarea" id="l-situation" placeholder="例：目を合わせなかった、スマホを隠した、返信が急に遅くなった、など"></textarea></div>
         <div class="fgroup"><label class="flabel">▸ 最近の変化（気になること）</label><textarea class="ftextarea" id="l-change" placeholder="例：急に帰りが遅くなった、優しくなった、逆に冷たくなった、など"></textarea></div>
-        <button class="btndivine red" onclick="divine('lie')">🔍 嘘・深層心理を暴く</button>
+        <button class="btndivine red" onclick="divine('lie')">🔍 違和感・深層心理を暴く</button>
       </div>
       <div class="loading" id="load-lie"><div class="crystal"></div><div class="dots"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div><div class="loadtxt">深層心理を分析しています…</div></div>
-      <div class="result" id="res-lie"><div class="res-header"><div class="res-title">🚨 深層心理解析結果</div><div class="divider"></div></div><div id="res-lie-c"></div><p class="disclaimer">※ エンタメ目的です。確定的な判断はできません。大切な判断はご自身で。</p></div>
+      <div class="result" id="res-lie"><div class="res-header"><div class="res-title">🌸　深層心理解析結果</div><div class="divider"></div></div><div id="res-lie-c"></div><p class="disclaimer">※ エンタメ目的です。確定的な判断はできません。大切な判断はご自身で。</p></div>
     </div>
 
-    <!-- 気づき発見 -->
+    <!-- 良い点発見 -->
     <div class="panel" id="panel-growth">
       <div class="card">
         <div class="card-title">気づき・良い点発見AI</div>
@@ -220,7 +220,7 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
         <button class="btndivine" onclick="divine('growth')">✦ 自分を発見する ✦</button>
       </div>
       <div class="loading" id="load-growth"><div class="crystal"></div><div class="dots"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div><div class="loadtxt">あなたの輝きを探しています…</div></div>
-      <div class="result" id="res-growth"><div class="res-header"><div class="res-title">✦ 気づきの結果 ✦</div><div class="divider"></div></div><div id="res-growth-c"></div><p class="disclaimer">※ エンタメ・自己理解を目的としたものです</p></div>
+      <div class="result" id="res-growth"><div class="res-header"><div class="res-title">✦ 助け合う言葉の結果 ✦</div><div class="divider"></div></div><div id="res-growth-c"></div><p class="disclaimer">※ エンタメ・自己理解を目的としたものです</p></div>
     </div>
 
   </div>
@@ -288,7 +288,7 @@ function genFuture(name,age,worry,genre){
   return {flow:pick(flows,s),caution:pick(cautions,s+1),chance:pick(chances,s+2),action:pick(actions,s+3),message:pick(msgs,s+4)};
 }
 
-// 本音解析
+// 心理傾向分析
 function genHeart(relation,message,situation){
   const s=hash(relation+message+situation);
   const feelings=[
@@ -321,7 +321,7 @@ function genHeart(relation,message,situation){
   return{true_feeling:pick(feelings,s),pulse_rate:pr,pulse_comment:pulseComments[s%pulseComments.length],caution:pick(cautions,s+1),action:pick(actions,s+2),advice:pick(advices,s+3)};
 }
 
-// 嘘発見・深層心理
+// 良く点発見・深層心理
 function genLie(relation,words,situation,change){
   const s=hash(relation+words+situation+change);
 
@@ -341,13 +341,13 @@ function genLie(relation,words,situation,change){
     `【回避型愛着行動】相手は感情的な対立を避けようとする傾向が見られます。問い詰められることへの恐怖から、曖昧な表現や話題転換を行う可能性があります。\n\n【投影】自分が後ろめたいことがあるとき、逆にあなたを責めたり疑ったりする行動が出やすくなります。\n\n【合理化】自分の行動を正当化するために、もっともらしい理由を後付けする心理が働いている可能性があります。`,
     `【ガスライティングの兆候】あなたの感覚や記憶を否定するような言動が見られる場合、これは心理的操作の一種です。「そんなこと言ってない」「気のせいだよ」という言葉には注意が必要です。\n\n【防衛機制（否認）】都合の悪い現実を認めたくないために、事実を否定する心理が働いている可能性があります。`,
     `【ダブルバインド】あなたを混乱させるような矛盾したメッセージを送る行動が見られます。優しくしたかと思えば急に冷たくなるパターンは、相手自身も感情が定まっていないサインです。\n\n【解離】罪悪感から逃げるために、感情を切り離して何事もなかったように振る舞う防衛機制が作動している可能性があります。`,
-    `【不安型愛着】相手は関係を失う恐怖と、自分の欲求の間で揺れている可能性があります。嘘は関係を保つための手段として用いられることがあります。\n\n【選択的情報開示】すべてを隠すのではなく、都合のいい部分だけを伝える「半分の嘘」が使われている可能性があります。これは発見されにくい欺瞞の形です。`,
+    `【不安型愛着】相手は関係を失う恐怖と、自分の欲求の間で揺れている可能性があります。言葉分析は関係を保つための手段として用いられることがあります。\n\n【選択的情報開示】すべてを隠すのではなく、都合のいい部分だけを伝える「半分の嘘」が使われている可能性があります。これは発見されにくい欺瞞の形です。`,
   ];
 
   const warnings=[
     `最も注意すべきサイン：${change.slice(0,10)}という変化は、何かを隠している人に共通して見られるパターンです。スマホを常に伏せて置く・以前より帰宅が遅い・理由を聞くと過度に防衛的になる、これらが重なる場合は慎重な対応が必要です。`,
     `${situation.slice(0,10)}という状況での行動変容は要注意です。急に優しくなった場合は罪悪感の裏返し、逆に冷たくなった場合は感情的距離を置こうとしているサインの可能性があります。どちらも突然の変化が続く場合は注意が必要です。`,
-    `言語的サインとして「絶対に」「本当に」「信じて」などの強調表現を多用する場合、心理学では過補償（嘘を信じさせようとする無意識の努力）の可能性があります。また目を合わせない・声のトーンが変わるなど非言語サインも重要です。`,
+    `言語的サインとして「絶対に」「本当に」「信じて」などの強調表現を多用する場合、心理学では過補償（言葉を信じさせようとする無意識の努力）の可能性があります。また目を合わせない・声のトーンが変わるなど非言語サインも重要です。`,
     `コミュニケーションパターンの変化に注目してください。以前はすぐ返信が来ていたのに遅くなった・話題を変えるのが早くなった・特定の場所や人の話になると緊張する、これらは複合的に判断する必要があります。`,
   ];
 
@@ -368,7 +368,7 @@ function genLie(relation,words,situation,change){
   };
 }
 
-// 気づき発見
+// 助け合う言葉発見
 function genGrowth(worry,event,interest){
   const s=hash(worry+event+interest);
   const strengths=[
@@ -440,7 +440,7 @@ function divine(section){
     if(section==='lie'){
       data=genLie(document.getElementById('l-relation').value,document.getElementById('l-words').value.trim(),document.getElementById('l-situation').value.trim(),document.getElementById('l-change').value.trim());
       const isHigh=data.lie_rate>=70;
-      html=bar(`🚨 嘘の可能性【${data.lie_level}】`,isHigh?'⚠️ 注意が必要なレベルです':'慎重に様子を見ましょう',data.lie_rate,true,pfId)
+      html=bar(`🌸　言葉分析の可能性【${data.lie_level}】`,isHigh?'⚠️ 注意が必要なレベルです':'慎重に様子を見ましょう',data.lie_rate,true,pfId)
           +ri('🔍','言葉の矛盾・欺瞞のサイン',data.contradiction,isHigh)
           +`<div class="ritem${isHigh?' danger':''}"><div class="rlabel${isHigh?' red':''}">🧠 深層心理・防衛機制の分析</div><div class="rtext">${data.psychology.replace(/\n/g,'<br>')}</div></div>`
           +ri('⚠️','注意すべき行動パターン',data.warning,isHigh)
@@ -448,7 +448,7 @@ function divine(section){
     }
     if(section==='growth'){
       data=genGrowth(document.getElementById('g-worry').value.trim(),document.getElementById('g-event').value.trim(),document.getElementById('g-interest').value.trim());
-      html=ri('🌟','あなたの良い点',data.strength)+ri('💎','隠れた才能',data.talent)+ri('🌿','今の気づき',data.awareness)+ri('👣','前向きな一歩',data.step)+ri('🔥','応援メッセージ',data.cheer);
+      html=ri('🌟','あなたの良い点',data.strength)+ri('💎','隠れた才能',data.talent)+ri('🌿','今の助け合う言葉',data.awareness)+ri('👣','前向きな一歩',data.step)+ri('🔥','応援メッセージ',data.cheer);
     }
     contentEl.innerHTML=html;
     loadEl.classList.remove('show');
